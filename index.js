@@ -2,9 +2,16 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import { createServer } from 'http';
-import  { findUser, addUser, getRoomUsers }  from "./utils.js";
+import  { findUser, addUser, getRoomUsers,  }  from "./utils.js";
 import { Server } from "socket.io";
+import { register, getMe, login, findUserOne } from "./controllers/UserController.js";
+import { registerValidation, loginValidation } from "./validations/validations.js";
+import { msgCreate, msgGet, msgGetAllUsers, msgRoomCreate } from "./controllers/MsgController.js";
+import checkAuth from './utils/checkAuth.js';
 
+mongoose.connect("mongodb+srv://Admin:Qwe12345@cluster0.dnz9j0y.mongodb.net/?retryWrites=true&w=majority")
+.then(() => console.log("DB Ok"))
+.catch((err) => console.log("DB ERROR", err));
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -47,3 +54,7 @@ const io = new Server(httpServer, {
     });
   });
 
+  app.post('/auth/register', registerValidation, register);
+  app.get('/auth/me', checkAuth, getMe);
+  app.post('/auth/login', loginValidation, login);
+  app.post('/user/findUser', checkAuth, findUserOne)
